@@ -1,0 +1,13 @@
+[package]
+name = "rescue_constants_generator"
+version = "0.1.0"
+authors = ["lispczz <mycinbrin@gmail.com>"]
+edition = "2018"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+franklin_crypto = { package = "franklin-crypto", version = "0.0.5", git = "https://github.com/matter-labs/franklin-crypto.git", branch="check-franklin-circuit-transpile"}
+serde = { version = "1.0.122", features = ["derive"] }
+serde_json = "1.0.61"
+num-bigint = "0.3.1"
