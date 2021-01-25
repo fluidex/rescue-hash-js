@@ -49,14 +49,16 @@ function rescueMimc(inputs) {
         state[idx] = F.pow(state[idx], FIVE);
       }
     }
-    buffer = [...ROUND_CONSTANTS[r]];
-    for (let idx = 0; idx < buffer.length; idx++) {
-      buffer[idx] = F.add(buffer[idx], dotProduct(state, MDS_MATRIX[idx]));
+    buffer = Array(STATE_WIDTH).fill(F.zero);
+    for (let idx = 0; idx < state.length; idx++) {
+      buffer[idx] = dotProduct(state, MDS_MATRIX[idx]);
     }
     state = [...buffer];
+    for (let idx = 0; idx < state.length; idx++) {
+      state[idx] = F.add(state[idx], ROUND_CONSTANTS[r][idx]);
+    }
   }
   return state;
-  //return F.normalize(state[0]);
 }
 
 function rescueHash(inputs) {
