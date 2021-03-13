@@ -735,6 +735,7 @@ version = "0.1.0"
 dependencies = [
  "console_error_panic_hook",
  "franklin-crypto",
+ "js-sys",
  "wasm-bindgen",
  "web-sys",
 ]

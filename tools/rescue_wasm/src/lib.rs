@@ -1,6 +1,6 @@
 use franklin_crypto::bellman::bn256::{Bn256, Fr};
-use franklin_crypto::bellman::PrimeField;
-use franklin_crypto::bellman::PrimeFieldRepr;
+use franklin_crypto::bellman::{from_hex, to_hex};
+use franklin_crypto::bellman::{PrimeField, PrimeFieldRepr};
 use franklin_crypto::rescue::bn256::Bn256RescueParams;
 use franklin_crypto::rescue::rescue_hash;
 use web_sys::console;
@@ -41,5 +41,18 @@ pub fn rescue_hash_bytes(msg: &[u8]) -> Vec<u8> {
         let input: Vec<Fr> = msg.iter().map(byte_to_field).collect();
         let hash_output = rescue_hash::<Bn256>(&params, &input);
         field_to_bytes(&hash_output[0])
+    })
+}
+
+#[wasm_bindgen(js_name=rescueHashHex)]
+pub fn rescue_hash_hex(msgs: js_sys::Array) -> String {
+    RESCUE_PARAMS.with(|params| {
+        // msgs can either start with '0x' or not
+        let inputs: Vec<Fr> = msgs
+            .iter()
+            .map(|s| from_hex(&s.as_string().unwrap()).unwrap())
+            .collect();
+        let hash_output = rescue_hash::<Bn256>(&params, &inputs);
+        format!("0x{}", to_hex(&hash_output[0]))
     })
 }
