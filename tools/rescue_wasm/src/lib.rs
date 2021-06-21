@@ -1,3 +1,6 @@
+#![feature(test)]
+extern crate test;
+
 use franklin_crypto::bellman::bn256::{Bn256, Fr};
 use franklin_crypto::bellman::{from_hex, to_hex};
 use franklin_crypto::bellman::{PrimeField, PrimeFieldRepr};
@@ -44,15 +47,37 @@ pub fn rescue_hash_bytes(msg: &[u8]) -> Vec<u8> {
     })
 }
 
-#[wasm_bindgen(js_name=rescueHashHex)]
-pub fn rescue_hash_hex(msgs: js_sys::Array) -> String {
+fn rescue_hash_hex(msgs: &Vec<String>) -> String {
     RESCUE_PARAMS.with(|params| {
         // msgs can either start with '0x' or not
-        let inputs: Vec<Fr> = msgs
-            .iter()
-            .map(|s| from_hex(&s.as_string().unwrap()).unwrap())
-            .collect();
+        let inputs: Vec<Fr> = msgs.iter().map(|s| from_hex(&s).unwrap()).collect();
         let hash_output = rescue_hash::<Bn256>(&params, &inputs);
         format!("0x{}", to_hex(&hash_output[0]))
     })
+}
+
+#[wasm_bindgen(js_name=rescueHashHex)]
+pub fn rescue_hash_hex_js(msgs: js_sys::Array) -> String {
+    rescue_hash_hex(
+        &msgs
+            .iter()
+            .map(|s| s.as_string().unwrap().clone())
+            .collect::<Vec<String>>(),
+    )
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use test::Bencher;
+    #[bench]
+    fn bench_hash(b: &mut Bencher) {
+        b.iter(|| {
+            rescue_hash_hex(&vec![
+                "0x17".to_string(),
+                "0x18".to_string(),
+                "0x19".to_string(),
+            ])
+        });
+    }
 }
